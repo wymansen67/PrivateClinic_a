@@ -1,0 +1,152 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AvaloniaPrivateClinic.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="450"
+        x:Class="AvaloniaPrivateClinic.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        WindowState="Maximized"
+        Title="">
+
+<DockPanel>
+        <StackPanel
+            Orientation="Horizontal"
+            DockPanel.Dock="Top"
+            HorizontalAlignment="Center">
+
+            <Label
+                Foreground="Black"
+                Content="🔎 Поиск:"
+                FontWeight="Bold"
+                FontSize="19" />
+
+            <TextBox
+                Text="{Binding SearchString, UpdateSourceTrigger=PropertyChanged}"
+                FontSize="18"
+                Width="400"
+                Height="25"
+                Padding="0 0 15 0"
+                Margin="10 10 0 0" />
+
+        </StackPanel>
+
+        <DockPanel DockPanel.Dock="Left">
+            <StackPanel
+                Margin="8"
+                Orientation="Vertical"
+                Width="300">
+
+                <StackPanel Orientation="Horizontal">
+                    <Label
+                        Foreground="Black"
+                        Content="Дата:"
+                        FontSize="20"
+                        FontWeight="Bold"
+                        Margin="0 20 0 0" />
+
+                    <ComboBox
+                        ItemsSource="{Binding Dates, Mode=OneWay}"
+                        SelectedItem="{Binding SelectedDate}"
+                        FontSize="16"
+                        Width="240"
+                        Margin="0 20 0 0" />
+                </StackPanel>
+
+                <Button
+                    Content="Сбросить"
+                    Background="White"
+                    FontFamily="Arial"
+                    FontWeight="Bold"
+                    Margin="0 15 0 10"
+                    Command="{Binding ResetCommand}" />
+
+                <Label
+                    Foreground="Black"
+                    Content="Действия со списком:"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Margin="0 55 0 0" />
+
+                <Button
+                    Content="Добавить ➕"
+                    FontFamily="Arial"
+                    FontWeight="Bold"
+                    Margin="0 15 0 10"
+                    Command="{Binding AddCommand}" />
+
+                <Button
+                    Content="Просмотреть ✏️"
+                    Margin="0 0 0 10"
+                    FontFamily="Arial"
+                    FontWeight="Bold"
+                    Command="{Binding ViewCommand}" />
+
+                <Button
+                    Content="Удалить 🗑"
+                    FontFamily="Arial"
+                    FontWeight="Bold"
+                    Command="{Binding RemoveCommand}"
+                    IsVisible="False" />
+
+            </StackPanel>
+        </DockPanel>
+
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+  <StackPanel>
+
+    <!-- Заголовок -->
+    <Grid ColumnDefinitions="250,*" Margin="0,0,0,10">
+      <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+        <StackPanel Orientation="Horizontal">
+        </StackPanel>
+      </ScrollViewer>
+    </Grid>
+
+    <!-- Таблица -->
+    <ItemsControl ItemsSource="{Binding AppointmentsTable}">
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Grid ColumnDefinitions="250,*" Margin="0,2">
+
+            <!-- Фиксированный столбец: пациент -->
+            <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="0,0,1,1" Padding="5">
+              <TextBlock Text="{Binding Patient}" VerticalAlignment="Center"/>
+            </Border>
+
+            <!-- Горизонтально скроллимые даты -->
+            <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
+              <ItemsControl ItemsSource="{Binding AppointmentsByDate}">
+                <ItemsControl.ItemsPanel>
+                  <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                  </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Width="150" Padding="5" Margin="1">
+                      <StackPanel>
+                        <TextBlock Text="{Binding Key}" FontWeight="Bold" FontSize="12" TextAlignment="Center" />
+                        <TextBlock TextWrapping="Wrap" FontSize="15">
+                          <TextBlock.Text>
+                            <Binding Path="Value" Converter="{StaticResource ListToStringConverter}" />
+                          </TextBlock.Text>
+                        </TextBlock>
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </ScrollViewer>
+
+          </Grid>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+
+  </StackPanel>
+</ScrollViewer>
+
+    </DockPanel>
+  
+</Window>

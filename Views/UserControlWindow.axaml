@@ -1,0 +1,76 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:AvaloniaPrivateClinic.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaPrivateClinic.Views.UserControlWindow"
+        x:DataType="vm:UserControlViewModel"
+        WindowState="Maximized"
+        Closed="UserControlWindow_Closed"
+        Title="">
+ 
+        <StackPanel Margin="20" VerticalAlignment="Center" HorizontalAlignment="Center" Width="666">
+
+     <TextBlock Text="Заполнение данных о новом пациенте" TextAlignment="Center" FontSize="25"/>
+
+     <Grid>
+         <Grid.RowDefinitions>
+             <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
+             <RowDefinition Height="Auto"/>
+         </Grid.RowDefinitions>
+
+         <Grid.ColumnDefinitions>
+             <ColumnDefinition Width="Auto"/>
+             <ColumnDefinition Width="*"/>
+         </Grid.ColumnDefinitions>
+
+         <!-- Имя -->
+         <TextBlock Text="Имя:" FontSize="18" Grid.Row="0" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+         <TextBox FontSize="18" Grid.Row="0" Grid.Column="1" Margin="5" Text="{Binding PatientFirstName, Mode=TwoWay}"/>
+
+         <!-- Отчество -->
+         <TextBlock Text="Отчество:" FontSize="18" Grid.Row="1" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+         <TextBox FontSize="18" Grid.Row="1" Grid.Column="1" Margin="5" Text="{Binding PatientMiddleName, Mode=TwoWay}"/>
+
+         <!-- Фамилия -->
+         <TextBlock Text="Фамилия:" FontSize="18" Grid.Row="2" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+         <TextBox FontSize="18" Grid.Row="2" Grid.Column="1" Margin="5" Text="{Binding PatientLastName, Mode=TwoWay}"/>
+
+         <!-- Пол -->
+         <TextBlock Text="Пол (м/ж):" FontSize="18" Grid.Row="3" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+         <TextBox FontSize="18" Grid.Row="3" Grid.Column="1" Margin="5" Text="{Binding PatientGender, Mode=TwoWay}"/>
+
+         <!-- Дата рождения -->
+         <TextBlock Text="Дата рождения:" FontSize="18" Grid.Row="4" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+         <TextBox FontSize="18" Grid.Row="4" Grid.Column="1" Margin="5" Text="{Binding PatientBirthday, Mode=TwoWay}"/>
+
+         <!-- Полис -->
+         <TextBlock Text="Страховой полис:" FontSize="18" Grid.Row="5" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+         <TextBox FontSize="18" Grid.Row="5" Grid.Column="1" Margin="5" Text="{Binding PatientInsuranceId, Mode=TwoWay}"/>
+
+         <!-- Телефон -->
+         <TextBlock Text="Телефон:" FontSize="18" Grid.Row="6" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+         <TextBox FontSize="18" Grid.Row="6" Grid.Column="1" Margin="5" Text="{Binding PatientPhone, Mode=TwoWay}"/>
+
+         <!-- Адрес -->
+         <TextBlock Text="Адрес:" FontSize="18" Grid.Row="7" Grid.Column="0" Margin="5" VerticalAlignment="Center"/>
+         <TextBox FontSize="18" Grid.Row="7" Grid.Column="1" Margin="5" Text="{Binding PatientAddress, Mode=TwoWay}"/>
+
+         <!-- Кнопка сохранения -->
+         <Button Content="Сохранить" FontSize="18" Grid.Row="9" Grid.ColumnSpan="2" Grid.Column="0"
+                 HorizontalAlignment="Center" Margin="0,20,0,0" Height="40" Width="656" Command="{Binding SavePatient}"/>
+
+     </Grid>
+
+ </StackPanel>
+        
+</Window>

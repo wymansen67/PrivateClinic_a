@@ -1,0 +1,135 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AvaloniaPrivateClinic.ViewModels"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaPrivateClinic.Views.PreAppointmentWindow"
+        x:DataType="vm:PreAppointmentViewModel"
+        WindowState="Maximized"
+        Title="">
+
+    <DockPanel>
+
+        <Grid DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <StackPanel HorizontalAlignment="Left" Grid.Column="0" Grid.Row="0" Orientation="Horizontal">
+
+                <Button x:Name="Back" Content="←" Command="{Binding Back}" IsEnabled="True" />
+
+                <TextBlock Text="Пациент (ФИО)" Margin="100 0 0 0" HorizontalAlignment="Center"
+                           FontFamily="Bahnschrift Light" FontSize="20" />
+
+            </StackPanel>
+
+            <TextBlock Text="Существующие пациенты" HorizontalAlignment="Center" FontFamily="Bahnschrift Light"
+                       Grid.Column="1" Grid.Row="0" FontSize="20" />
+
+            <TextBlock Text="Кабинет" HorizontalAlignment="Center" FontFamily="Bahnschrift Light" Grid.Column="2"
+                       Grid.Row="0" FontSize="20" />
+
+            <ComboBox x:Name="CbPatients" Grid.Column="1" Grid.Row="1" Margin="10,0,10,0" MinWidth="350"
+                      HorizontalContentAlignment="Center" HorizontalAlignment="Center"
+                      SelectionChanged="CbPatients_SelectionChanged" FontSize="20" ItemsSource="{Binding Patients}"
+                      DisplayMemberBinding="{Binding ToString}" SelectedItem="{Binding SelectedPatient}" />
+
+            <Grid Grid.Column="1" Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Button x:Name="BAddPatient" Content="Добавить пациента ➕" Grid.Column="0" Grid.Row="0"
+                        Margin="10,10,10,50" FontSize="18" IsEnabled="True" Command="{Binding AddPatient}" />
+
+                <StackPanel x:Name="SpPlanning" Orientation="Vertical" VerticalAlignment="Bottom" IsVisible="False"
+                            Grid.Column="0" Grid.Row="1">
+
+                    <ComboBox x:Name="CbDates" FontSize="20" Margin="10, 0 , 10 , 0"
+                              SelectionChanged="CbDates_SelectionChanged" />
+
+                    <StackPanel x:Name="SpTime" IsVisible="False" Orientation="Horizontal" HorizontalAlignment="Center"
+                                Margin="0, 10, 0, 0">
+
+                        <ComboBox x:Name="CbHours" FontSize="20" Margin="10, 0 , 5 , 0" Width="60" />
+
+                        <TextBlock Text=":" FontSize="20" />
+
+                        <ComboBox x:Name="CbMinutes" FontSize="20" Margin="5, 0 , 10 , 0" Width="60" />
+
+                    </StackPanel>
+
+                    <ComboBox x:Name="CbPurposes" Margin="10,20,10,0" HorizontalContentAlignment="Stretch"
+                              FontSize="20" ItemsSource="{Binding Purposes}"
+                              DisplayMemberBinding="{Binding PurposeName}" />
+
+                    <ComboBox x:Name="CbSpecialists" Margin="10,20,10,0" HorizontalContentAlignment="Stretch"
+                              FontSize="20" IsVisible="False" ItemsSource="{Binding Specialists}"
+                              DisplayMemberBinding="{Binding ToString}" />
+
+                    <ComboBox x:Name="CbEquipment" Margin="10,20,10,10" HorizontalContentAlignment="Stretch"
+                              FontSize="20" VerticalAlignment="Bottom" ItemsSource="{Binding AvailableEquipments}"
+                              DisplayMemberBinding="{Binding EquipmentName}" />
+
+                    <Button x:Name="BInsertEquipment" Content="+" Margin="5,0,0,10" Width="50"
+                            VerticalAlignment="Bottom" IsEnabled="True" HorizontalContentAlignment="Center" />
+
+                    <Button x:Name="BRemoveEquipment" Content="-" Margin="5,0,0,10" Width="50"
+                            VerticalAlignment="Bottom" IsVisible="False" IsEnabled="True"
+                            HorizontalContentAlignment="Center" />
+
+                    <ListBox x:Name="EquipmentListBox" Height="150" Margin="0,5,0,10" FontSize="14"
+                             VerticalAlignment="Bottom" ItemsSource="{Binding ClaimedEquipments}"
+                             DisplayMemberBinding="{Binding EquipmentName}" />
+
+                </StackPanel>
+
+            </Grid>
+
+            <ComboBox x:Name="CbOffices" Grid.Column="2" Grid.Row="1" Margin="10,0,10,0" MinWidth="350"
+                      HorizontalContentAlignment="Center" HorizontalAlignment="Center" FontSize="20"
+                      ItemsSource="{Binding Offices}" DisplayMemberBinding="{Binding ToString}"
+                      SelectedItem="{Binding SelectedOffice}" />
+
+            <TextBlock x:Name="PatientInfo" Grid.Column="0" Grid.Row="2" Height="250" Margin="10,10,10,0" FontSize="26"
+                       TextWrapping="Wrap" />
+
+        </Grid>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="80" DockPanel.Dock="Bottom">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="0.1*" />
+                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="0.1*" />
+                </Grid.ColumnDefinitions>
+
+                <CheckBox x:Name="CbDummy" Content="Запланировать приём" FontSize="20" Grid.Column="0"
+                          IsVisible="False" Margin="10" />
+
+                <Button x:Name="BStartAppointment" Content="Начать приём" DockPanel.Dock="Bottom" Margin="10,0,10,0"
+                        Width="600" FontSize="18" Grid.Column="1" IsEnabled="True" Command="{Binding Start}" />
+
+                <CheckBox x:Name="CbReserve" Content="Запланировать приём" FontSize="20" Grid.Column="2" Margin="10"
+                          IsChecked="False" IsCheckedChanged="CbReserve_OnIsCheckedChangedChanged" />
+
+            </Grid>
+        </StackPanel>
+
+    </DockPanel>
+</Window>

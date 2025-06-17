@@ -1,0 +1,139 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AvaloniaPrivateClinic.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="1050" d:DesignHeight="660" MinHeight="660" MinWidth="1250"
+        x:Class="AvaloniaPrivateClinic.Views.AppointmentWindow"
+        WindowState="Maximized"
+        x:DataType="vm:AppointmentViewModel"
+        Title="AppointmentWindow">
+    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="2*,2*,2*">
+
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
+            <Button Content="←" Command="{Binding GoBackCommand}" VerticalAlignment="Center" Margin="0,0,10,0" />
+            <TextBlock Text="Номер кабинета:" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" />
+            <TextBlock Text="{Binding OfficeLabel}" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="16" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+            <TextBlock Text="Дата:" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" />
+            <TextBlock Text="{Binding DateLabel}" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="16" />
+        </StackPanel>
+
+        <Border Grid.Row="1" Grid.Column="0" BorderBrush="LightGray" BorderThickness="1" Margin="10" Padding="5">
+            <StackPanel>
+                <TextBlock Text="Информация о пациенте и специалисте:" FontWeight="Bold" FontSize="22" Margin="0,0,0,5" />
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <TextBlock Text="{Binding PatientInfoText}" TextWrapping="Wrap" FontSize="22" />
+                </ScrollViewer>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="10">
+            <TextBlock Text="Причина приёма:" FontWeight="Bold" FontSize="14" />
+            <ComboBox ItemsSource="{Binding AvailablePurposes}"
+                      SelectedItem="{Binding SelectedPurpose}"
+                      DisplayMemberBinding="{Binding PurposeName}"
+                      IsEnabled="{Binding CanEdit}"
+                      Width="NaN" HorizontalAlignment="Stretch" FontSize="14" Margin="0,5,0,10" />
+
+            <TextBlock Text="Комментарии:" FontWeight="Bold" FontSize="14" />
+            <TextBox Text="{Binding Commentaries}"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     IsReadOnly="{Binding IsReadOnly}"
+                     MinHeight="100"
+                     MaxHeight="200"
+                     Margin="0,5,0,10" FontSize="14" />
+
+            <TextBlock Text="Диагноз:" FontWeight="Bold" FontSize="14" />
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding CanEdit}">
+                <ComboBox ItemsSource="{Binding AvailableDiagnoses}"
+                          SelectedItem="{Binding SelectedAvailableDiagnosis}"
+                          IsEnabled="{Binding CanEdit}"
+                          HorizontalAlignment="Stretch" FontSize="14" Margin="0,5,5,5">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding ToString}" TextWrapping="Wrap" MaxWidth="350" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+                <Button Content="+" Command="{Binding AddDiagnosisCommand}" IsEnabled="{Binding CanEdit}"
+                        Margin="0,5,0,5" FontWeight="Bold" />
+                <Button Content="-" Command="{Binding RemoveDiagnosisCommand}" IsEnabled="{Binding CanEdit}"
+                        IsVisible="{Binding CanRemoveDiagnosis}" Margin="0,5,0,5" FontWeight="Bold" />
+            </StackPanel>
+            <ListBox ItemsSource="{Binding SelectedDiagnoses}"
+                     SelectedItem="{Binding SelectedDiagnosisToRemove}"
+                     MinHeight="100" MaxHeight="150" Margin="0,0,0,10" FontSize="14">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding ToString}" TextWrapping="Wrap" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="2" Margin="10">
+            <TextBlock Text="Услуги:" FontWeight="Bold" FontSize="14" />
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding CanEdit}">
+                <ComboBox ItemsSource="{Binding AvailableServices}"
+                          SelectedItem="{Binding SelectedAvailableService}"
+                          DisplayMemberBinding="{Binding Name}"
+                          IsEnabled="{Binding CanEdit}"
+                          Width="NaN" HorizontalAlignment="Stretch" FontSize="14" Margin="0,5,5,5" />
+                <Button Content="+" Command="{Binding AddServiceCommand}" IsEnabled="{Binding CanEdit}"
+                        Margin="0,5,0,5" FontWeight="Bold" />
+                <Button Content="-" Command="{Binding RemoveServiceCommand}" IsEnabled="{Binding CanEdit}"
+                        IsVisible="{Binding CanRemoveService}" Margin="0,5,0,5" FontWeight="Bold" />
+            </StackPanel>
+            <ListBox ItemsSource="{Binding SelectedServices}"
+                     SelectedItem="{Binding SelectedServiceToRemove}"
+                     MinHeight="100" MaxHeight="150" Margin="0,0,0,10" FontSize="14">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock Text="Оборудование:" FontWeight="Bold" FontSize="14" />
+            <StackPanel Orientation="Horizontal" IsVisible="{Binding CanEdit}">
+                <ComboBox ItemsSource="{Binding AvailableEquipments}"
+                          SelectedItem="{Binding SelectedAvailableEquipment}"
+                          DisplayMemberBinding="{Binding EquipmentName}"
+                          IsEnabled="{Binding CanEdit}"
+                          Width="NaN" HorizontalAlignment="Stretch" FontSize="14" Margin="0,5,5,5" />
+                <Button Content="+" Command="{Binding AddEquipmentCommand}" IsEnabled="{Binding CanEdit}"
+                        Margin="0,5,0,5" FontWeight="Bold" />
+                <Button Content="-" Command="{Binding RemoveEquipmentCommand}" IsEnabled="{Binding CanEdit}"
+                        IsVisible="{Binding CanRemoveEquipment}" Margin="0,5,0,5" FontWeight="Bold" />
+            </StackPanel>
+            <ListBox ItemsSource="{Binding SelectedEquipments}"
+                     SelectedItem="{Binding SelectedEquipmentToRemove}"
+                     MinHeight="100" MaxHeight="150" Margin="0,0,0,10" FontSize="14">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding EquipmentName}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+
+        <Button Grid.Row="2" Grid.Column="1"
+                HorizontalContentAlignment="Center"
+                Content="{Binding SubmitButtonText}"
+                Command="{Binding SubmitAppointmentCommand}"
+                IsEnabled="{Binding CanEdit}"
+                IsVisible="{Binding CanEdit}" HorizontalAlignment="Stretch" Margin="10" FontSize="16" />
+
+        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="10">
+            <TextBlock Text="Общая стоимость:" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" />
+            <TextBlock Text="{Binding TotalPrice, StringFormat='{}{0:C}'}" MinWidth="100" VerticalAlignment="Center"
+                       Margin="5,0,0,0" FontSize="18" />
+        </StackPanel>
+
+    </Grid>
+</Window>
