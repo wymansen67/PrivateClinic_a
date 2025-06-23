@@ -9,7 +9,7 @@
         WindowState="Maximized"
         Title="">
 
-<DockPanel>
+    <DockPanel>
         <StackPanel
             Orientation="Horizontal"
             DockPanel.Dock="Top"
@@ -37,7 +37,15 @@
                 Orientation="Vertical"
                 Width="300">
 
+                <Label
+                    Foreground="Black"
+                    Content="{Binding LoggedInAs}"
+                    FontWeight="Bold"
+                    FontSize="25"
+                    Margin="0 5 0 0" />
+
                 <StackPanel Orientation="Horizontal">
+
                     <Label
                         Foreground="Black"
                         Content="Дата:"
@@ -75,78 +83,64 @@
                     Margin="0 15 0 10"
                     Command="{Binding AddCommand}" />
 
-                <Button
-                    Content="Просмотреть ✏️"
-                    Margin="0 0 0 10"
-                    FontFamily="Arial"
-                    FontWeight="Bold"
-                    Command="{Binding ViewCommand}" />
-
-                <Button
-                    Content="Удалить 🗑"
-                    FontFamily="Arial"
-                    FontWeight="Bold"
-                    Command="{Binding RemoveCommand}"
-                    IsVisible="False" />
-
             </StackPanel>
         </DockPanel>
 
         <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-  <StackPanel>
+            <StackPanel>
 
-    <!-- Заголовок -->
-    <Grid ColumnDefinitions="250,*" Margin="0,0,0,10">
-      <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-        <StackPanel Orientation="Horizontal">
-        </StackPanel>
-      </ScrollViewer>
-    </Grid>
+                <Grid ColumnDefinitions="250,*" Margin="0,0,0,10">
+                    <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto"
+                                  VerticalScrollBarVisibility="Disabled">
+                        <StackPanel Orientation="Horizontal" />
+                    </ScrollViewer>
+                </Grid>
 
-    <!-- Таблица -->
-    <ItemsControl ItemsSource="{Binding AppointmentsTable}">
-      <ItemsControl.ItemTemplate>
-        <DataTemplate>
-          <Grid ColumnDefinitions="250,*" Margin="0,2">
-
-            <!-- Фиксированный столбец: пациент -->
-            <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="0,0,1,1" Padding="5">
-              <TextBlock Text="{Binding Patient}" VerticalAlignment="Center"/>
-            </Border>
-
-            <!-- Горизонтально скроллимые даты -->
-            <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled">
-              <ItemsControl ItemsSource="{Binding AppointmentsByDate}">
-                <ItemsControl.ItemsPanel>
-                  <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal"/>
-                  </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                  <DataTemplate>
-                    <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Width="150" Padding="5" Margin="1">
-                      <StackPanel>
-                        <TextBlock Text="{Binding Key}" FontWeight="Bold" FontSize="12" TextAlignment="Center" />
-                        <TextBlock TextWrapping="Wrap" FontSize="15">
-                          <TextBlock.Text>
-                            <Binding Path="Value" Converter="{StaticResource ListToStringConverter}" />
-                          </TextBlock.Text>
-                        </TextBlock>
-                      </StackPanel>
-                    </Border>
-                  </DataTemplate>
-                </ItemsControl.ItemTemplate>
-              </ItemsControl>
-            </ScrollViewer>
-
-          </Grid>
-        </DataTemplate>
-      </ItemsControl.ItemTemplate>
-    </ItemsControl>
-
-  </StackPanel>
-</ScrollViewer>
+                <ItemsControl ItemsSource="{Binding AppointmentsTable}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="250,*" Margin="0,2">
+                                <!-- Фиксированный столбец: пациент -->
+                                <Border Grid.Column="0" BorderBrush="Gray" BorderThickness="0,0,1,1" Padding="5">
+                                    <TextBlock Text="{Binding Patient}" VerticalAlignment="Center" />
+                                </Border>
+                                <!-- Горизонтально скроллимые даты -->
+                                <ScrollViewer Grid.Column="1" HorizontalScrollBarVisibility="Auto"
+                                              VerticalScrollBarVisibility="Disabled">
+                                    <ItemsControl ItemsSource="{Binding AppointmentsByDate}">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <StackPanel Orientation="Horizontal" />
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Border BorderBrush="Gray" BorderThickness="0,0,1,1" Width="150"
+                                                        Padding="5" Margin="1">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Key}" FontWeight="Bold" FontSize="12"
+                                                                   TextAlignment="Center" />
+                                                        <TextBlock TextWrapping="Wrap" FontSize="15">
+                                                            <TextBlock.Text>
+                                                                <Binding Path="Value"
+                                                                         Converter="{StaticResource ListToStringConverter}" />
+                                                            </TextBlock.Text>
+                                                        </TextBlock>
+                                                        <Button Content="Обзор" Margin="5"
+                                                                Tapped="InputElement_OnTapped"/>
+                                                    </StackPanel>
+                                                </Border>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
 
     </DockPanel>
-  
+
 </Window>

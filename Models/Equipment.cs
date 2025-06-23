@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace AvaloniaPrivateClinic.Models;
 
-public partial class Equipment
+public class Equipment
 {
     public int EquipmentId { get; set; }
 

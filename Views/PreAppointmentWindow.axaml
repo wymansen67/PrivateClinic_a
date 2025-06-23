@@ -3,6 +3,7 @@
         xmlns:vm="using:AvaloniaPrivateClinic.ViewModels"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="AvaloniaPrivateClinic.Views.PreAppointmentWindow"
         x:DataType="vm:PreAppointmentViewModel"
@@ -39,10 +40,18 @@
             <TextBlock Text="Кабинет" HorizontalAlignment="Center" FontFamily="Bahnschrift Light" Grid.Column="2"
                        Grid.Row="0" FontSize="20" />
 
-            <ComboBox x:Name="CbPatients" Grid.Column="1" Grid.Row="1" Margin="10,0,10,0" MinWidth="350"
-                      HorizontalContentAlignment="Center" HorizontalAlignment="Center"
-                      SelectionChanged="CbPatients_SelectionChanged" FontSize="20" ItemsSource="{Binding Patients}"
-                      DisplayMemberBinding="{Binding ToString}" SelectedItem="{Binding SelectedPatient}" />
+            <StackPanel Grid.Column="1" Grid.Row="1" Orientation="Vertical" HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <ComboBox x:Name="CbPatients" Margin="10,0,10,0" MinWidth="350"
+                          HorizontalContentAlignment="Center" HorizontalAlignment="Center"
+                          SelectionChanged="CbPatients_SelectionChanged" FontSize="20"
+                          ItemsSource="{Binding FilteredPatients}"
+                          DisplayMemberBinding="{Binding ToString}" SelectedItem="{Binding SelectedPatient}" 
+                          SelectedIndex="{Binding SelectedIndexPatient}"/>
+
+                <TextBox Text="{Binding SearchString, UpdateSourceTrigger=PropertyChanged}"
+                         Width="300" Margin="0 10" FontSize="18" />
+            </StackPanel>
 
             <Grid Grid.Column="1" Grid.Row="2">
                 <Grid.ColumnDefinitions>
@@ -54,32 +63,49 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <Button x:Name="BAddPatient" Content="Добавить пациента ➕" Grid.Column="0" Grid.Row="0"
-                        Margin="10,10,10,50" FontSize="18" IsEnabled="True" Command="{Binding AddPatient}" />
+                <StackPanel Grid.Column="0" Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Button x:Name="BAddPatient" Content="Добавить пациента ➕"
+                            Margin="10,10,10, 10" FontSize="18" IsEnabled="True" Command="{Binding AddPatient}"
+                            IsVisible="{Binding PatientOperations}" />
+
+                    <Button x:Name="BEditPatient" Content="Изменить пациента ✏️"
+                            Margin="10,10,10,10" FontSize="18" IsEnabled="True" Command="{Binding EditPatient}"
+                            IsVisible="{Binding PatientOperations}" />
+                </StackPanel>
 
                 <StackPanel x:Name="SpPlanning" Orientation="Vertical" VerticalAlignment="Bottom" IsVisible="False"
                             Grid.Column="0" Grid.Row="1">
 
-                    <ComboBox x:Name="CbDates" FontSize="20" Margin="10, 0 , 10 , 0"
-                              SelectionChanged="CbDates_SelectionChanged" />
+                    <Calendar 
+                              SelectedDate="{Binding SelectedDateTime, Mode=TwoWay}"
+                              Margin="10, 0 , 10 , 0"
+                              DisplayDateStart="{Binding MinSelectableDate}"
+                              DisplayDateEnd="{Binding MaxSelectableDate}"
+                              FontSize="16" />
 
                     <StackPanel x:Name="SpTime" IsVisible="False" Orientation="Horizontal" HorizontalAlignment="Center"
                                 Margin="0, 10, 0, 0">
 
-                        <ComboBox x:Name="CbHours" FontSize="20" Margin="10, 0 , 5 , 0" Width="60" />
-
-                        <TextBlock Text=":" FontSize="20" />
-
-                        <ComboBox x:Name="CbMinutes" FontSize="20" Margin="5, 0 , 10 , 0" Width="60" />
+                        <ComboBox ItemsSource="{Binding AvailableTimes}"
+                                  SelectedItem="{Binding SelectedTime}"
+                                  Width="150" Margin="10" FontSize="20" SelectedIndex="{Binding SelectedIndexTime}">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" />
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
 
                     </StackPanel>
 
                     <ComboBox x:Name="CbPurposes" Margin="10,20,10,0" HorizontalContentAlignment="Stretch"
                               FontSize="20" ItemsSource="{Binding Purposes}"
+                              SelectedItem="{Binding SelectedPurpose}"
                               DisplayMemberBinding="{Binding PurposeName}" />
 
                     <ComboBox x:Name="CbSpecialists" Margin="10,20,10,0" HorizontalContentAlignment="Stretch"
                               FontSize="20" IsVisible="False" ItemsSource="{Binding Specialists}"
+                              SelectedItem="{Binding SelectedSpecialist}"
                               DisplayMemberBinding="{Binding ToString}" />
 
                     <ComboBox x:Name="CbEquipment" Margin="10,20,10,10" HorizontalContentAlignment="Stretch"
@@ -98,7 +124,7 @@
                              DisplayMemberBinding="{Binding EquipmentName}" />
 
                 </StackPanel>
-
+                
             </Grid>
 
             <ComboBox x:Name="CbOffices" Grid.Column="2" Grid.Row="1" Margin="10,0,10,0" MinWidth="350"
@@ -108,7 +134,6 @@
 
             <TextBlock x:Name="PatientInfo" Grid.Column="0" Grid.Row="2" Height="250" Margin="10,10,10,0" FontSize="26"
                        TextWrapping="Wrap" />
-
         </Grid>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="80" DockPanel.Dock="Bottom">
@@ -121,12 +146,28 @@
 
                 <CheckBox x:Name="CbDummy" Content="Запланировать приём" FontSize="20" Grid.Column="0"
                           IsVisible="False" Margin="10" />
+                
+                <ComboBox Grid.Column="0"  VerticalAlignment="Center" HorizontalAlignment="Center" ItemsSource="{Binding PlannedAppointments}"
+                          SelectedItem="{Binding SelectedPlannedAppointment}"
+                          DisplayMemberBinding="{Binding PurposeNavigation.PurposeName}"
+                          FontSize="18" MinWidth="300" Margin="10 0"
+                          IsVisible="{Binding IsUsingPlannedAppointment}"/>
 
                 <Button x:Name="BStartAppointment" Content="Начать приём" DockPanel.Dock="Bottom" Margin="10,0,10,0"
-                        Width="600" FontSize="18" Grid.Column="1" IsEnabled="True" Command="{Binding Start}" />
-
+                        Width="600" FontSize="18" Grid.Column="1" IsVisible="{Binding !User.IsSuperuser}" Command="{Binding Start}" />
+                
+                <Button x:Name="BReserveAppointment" Content="Запланировать"
+                        Margin="10,0,10,0" Width="600" FontSize="18"
+                        IsVisible="{Binding User.IsSuperuser}" 
+                        Grid.Column="1" Command="{Binding ReserveAppointment}" />
+                
                 <CheckBox x:Name="CbReserve" Content="Запланировать приём" FontSize="20" Grid.Column="2" Margin="10"
-                          IsChecked="False" IsCheckedChanged="CbReserve_OnIsCheckedChangedChanged" />
+                          IsChecked="False" IsCheckedChanged="CbReserve_OnIsCheckedChangedChanged" IsVisible="False" IsEnabled="False"/>
+                
+                <CheckBox Content="Запланированный приём" Grid.Column="2"
+                          IsVisible="{Binding User.IsSuperuser, Converter={StaticResource InverseBooleanConverter}}"
+                          IsChecked="{Binding IsUsingPlannedAppointment}"
+                          FontSize="18" Margin="0,10,0,10"/>
 
             </Grid>
         </StackPanel>

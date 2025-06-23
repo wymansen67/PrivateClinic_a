@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace AvaloniaPrivateClinic.Models;
 
-public partial class OfficeType
+public class OfficeType
 {
     public int TypeId { get; set; }
 

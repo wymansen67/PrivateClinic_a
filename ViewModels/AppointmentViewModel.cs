@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using AvaloniaPrivateClinic.Encryption;
@@ -34,7 +35,7 @@ public partial class AppointmentViewModel : ViewModelBase
 
     [ObservableProperty] private ObservableCollection<Service> _availableServices = new();
 
-    [ObservableProperty] private bool _canEdit;
+    [ObservableProperty] private bool _canEdit = true;
 
     [ObservableProperty] private bool _canRemoveDiagnosis;
 
@@ -47,6 +48,7 @@ public partial class AppointmentViewModel : ViewModelBase
     [ObservableProperty] private string _dateLabel = DateTime.Now.ToString("d");
 
     [ObservableProperty] private bool _isReadOnly;
+    
     private Office? _office;
 
     [ObservableProperty] private string? _officeLabel;
@@ -108,14 +110,17 @@ public partial class AppointmentViewModel : ViewModelBase
         _appointmentWindow = aWindow ?? throw new ArgumentNullException(nameof(aWindow));
 
         _isEditMode = true;
-        WindowTitle = $"Просмотр/Редактирование приёма №{appointment.AppointmentNumber}";
-        IsReadOnly = appointment.IsPlanned != true || _user.IsSuperuser;
-        CanEdit = !IsReadOnly;
+        WindowTitle = $"Редактирование приёма №{appointment.AppointmentNumber}";
         SubmitButtonText = CanEdit ? "Внести изменения" : "Просмотр";
 
         InitializeEmptyCollections();
         _ = InitializeForExistingAsync();
     }
+
+    public double WindowHeight { get; set; }
+    public double InfoBlockHeight => WindowHeight * 0.3;
+
+    public ObservableCollection<DiagnosisEntry> DiagnosisHistory { get; } = new();
 
 
     private void InitializeEmptyCollections()
@@ -147,6 +152,10 @@ public partial class AppointmentViewModel : ViewModelBase
             await Task.WhenAll(loadedPatientTask.AsTask(), loadedOfficeTask.AsTask(), loadedSpecialistTask.AsTask());
 
             _patient = await loadedPatientTask;
+            _patient.LastName = Cryptography.Decrypt(_patient.LastName);
+            _patient.MiddleName = Cryptography.Decrypt(_patient.MiddleName);
+            _patient.FirstName = Cryptography.Decrypt(_patient.FirstName);
+            _patient.Address = Cryptography.Decrypt(_patient.Address);
             _office = await loadedOfficeTask;
             var loadedSpecialist = await loadedSpecialistTask;
 
@@ -193,10 +202,10 @@ public partial class AppointmentViewModel : ViewModelBase
     {
         if (_patient == null || _office == null) return;
 
-        specialistToDisplay.FirstName = Cryptography.Decrypt(_specialist.FirstName);
+        /*specialistToDisplay.FirstName = Cryptography.Decrypt(_specialist.FirstName);
         specialistToDisplay.MiddleName = Cryptography.Decrypt(_specialist.MiddleName);
-        specialistToDisplay.LastName = Cryptography.Decrypt(_specialist.LastName);
-        
+        specialistToDisplay.LastName = Cryptography.Decrypt(_specialist.LastName);*/
+
         OfficeLabel = _office.Number;
         LoadPatientInfo(_patient, specialistToDisplay);
 
@@ -328,23 +337,30 @@ public partial class AppointmentViewModel : ViewModelBase
 
     private void LoadPatientInfo(Patient patient, Specialist specialist)
     {
+        DiagnosisHistory.Clear();
+        var histList = _context.Appointments
+            .Where(a => a.Patient == patient.PatientId)
+            .Include(a => a.Diagnoses)
+            .Include(a => a.SpecialistNavigation.SpecializationNavigation)
+            .OrderByDescending(a => a.Date)
+            .ToList();
         var gender = patient.Gender == 'm' ? "Мужской" : "Женский";
-        var insurance = patient.InsuranceId > 0 && patient.InsuranceId.ToString().Length >= 8
-            ? patient.InsuranceId.ToString()
+        var insurance = patient.InsuranceId > 0 && patient.InsuranceId.ToString(CultureInfo.CurrentCulture).Length >= 8
+            ? patient.InsuranceId.ToString(CultureInfo.CurrentCulture)
             : "Страховка отсутствует";
-
-        PatientInfoText = $"Имя: {patient.FirstName}\n" +
-                          $"Фамилия: {patient.LastName}\n" +
+        PatientInfoText = $"Имя: {patient.FirstName}\n" + $"Фамилия: {patient.LastName}\n" +
                           $"Отчество: {patient.MiddleName}\n" +
-                          $"Дата рождения: {patient.Birthday.ToShortDateString()}\n" +
-                          $"Пол: {gender}\n" +
-                          $"Номер страховки: {insurance}\n" +
-                          $"Номер телефона: {patient.Phone}\n" +
-                          $"Адрес: {patient.Address}\n" +
-                          $"\nСпециалист:\n" +
-                          $"Фамилия: {specialist.LastName}\n" +
-                          $"Имя: {specialist.FirstName}\n" +
-                          $"Отчество: {specialist.MiddleName}";
+                          $"Дата рождения: {patient.Birthday.ToShortDateString()}\n" + $"Пол: {gender}\n" +
+                          $"Номер страховки: {insurance}\n" + $"Номер телефона: {patient.Phone}\n";
+        foreach (var a in histList)
+        {
+            var spec = a.SpecialistNavigation?.SpecializationNavigation?.Specialization1 ?? "—";
+            foreach (var x in a.Diagnoses)
+                DiagnosisHistory.Add(new DiagnosisEntry
+                {
+                    Date = a.Date.ToShortDateString(), Diagnosis = x.ToString, Specialization = spec
+                });
+        }
     }
 
     [RelayCommand]
@@ -577,8 +593,7 @@ public partial class AppointmentViewModel : ViewModelBase
     {
         if (_existingAppointment == null) return;
         if (_patient == null) throw new InvalidOperationException("Patient is not initialized for update.");
-
-
+        
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
@@ -609,7 +624,7 @@ public partial class AppointmentViewModel : ViewModelBase
             var existingReceipt = await _context.Receipts
                 .FirstOrDefaultAsync(r => r.AppointmentId == appointmentToUpdate.AppointmentNumber);
 
-            if (appointmentToUpdate.Specialist != null)
+            if (appointmentToUpdate.Specialist == null)
                 throw new InvalidOperationException(
                     "Specialist ID in appointment cannot be null when updating/creating receipt");
 
@@ -728,5 +743,12 @@ public partial class AppointmentViewModel : ViewModelBase
     partial void OnSelectedPurposeChanged(Purpose? value)
     {
         SubmitAppointmentCommand.NotifyCanExecuteChanged();
+    }
+
+    public class DiagnosisEntry
+    {
+        public string Date { get; set; }
+        public string Diagnosis { get; set; }
+        public string Specialization { get; set; }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace AvaloniaPrivateClinic.Models;
 
-public partial class Receipt
+public class Receipt
 {
     public int ReceiptId { get; set; }
 

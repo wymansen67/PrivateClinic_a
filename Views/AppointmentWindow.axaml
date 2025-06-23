@@ -7,7 +7,7 @@
         x:Class="AvaloniaPrivateClinic.Views.AppointmentWindow"
         WindowState="Maximized"
         x:DataType="vm:AppointmentViewModel"
-        Title="AppointmentWindow">
+        Title="{Binding WindowTitle}">
     <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="2*,2*,2*">
 
         <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
@@ -21,14 +21,43 @@
             <TextBlock Text="{Binding DateLabel}" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="16" />
         </StackPanel>
 
-        <Border Grid.Row="1" Grid.Column="0" BorderBrush="LightGray" BorderThickness="1" Margin="10" Padding="5">
-            <StackPanel>
-                <TextBlock Text="Информация о пациенте и специалисте:" FontWeight="Bold" FontSize="22" Margin="0,0,0,5" />
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <Grid Grid.Column="0" Grid.Row="1" ColumnDefinitions="*" RowDefinitions="Auto, *">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Информация о пациенте и специалисте:" FontWeight="Bold"
+                       FontSize="22" Margin="0,0,0,5" />
+            <StackPanel Grid.Row="1" Grid.Column="0" Orientation="Vertical">
+                <!-- Общая информация -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Height="{Binding InfoBlockHeight}">
                     <TextBlock Text="{Binding PatientInfoText}" TextWrapping="Wrap" FontSize="22" />
+                </ScrollViewer> <!-- История диагнозов -->
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Height="300">
+                    <ItemsControl ItemsSource="{Binding DiagnosisHistory}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Vertical" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border BorderBrush="Gray" BorderThickness="1" CornerRadius="5" Margin="5" Padding="10"
+                                        Background="#F9F9F9">
+                                    <Grid RowDefinitions="Auto,Auto" ColumnDefinitions="*,*">
+                                        <!-- Верхний ряд: Дата и Диагноз -->
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Text="{Binding Date}" FontWeight="Bold"
+                                                   FontSize="16" />
+                                        <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Diagnosis}"
+                                                   FontSize="16" TextAlignment="Right" TextWrapping="Wrap" />
+                                        <!-- Нижний ряд: Специализация -->
+                                        <TextBlock Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2"
+                                                   Text="{Binding Specialization}" FontStyle="Italic" Foreground="Gray"
+                                                   Margin="0,5,0,0" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </ScrollViewer>
             </StackPanel>
-        </Border>
+        </Grid>
 
         <StackPanel Grid.Row="1" Grid.Column="1" Margin="10">
             <TextBlock Text="Причина приёма:" FontWeight="Bold" FontSize="14" />

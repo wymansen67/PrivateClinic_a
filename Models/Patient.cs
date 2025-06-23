@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AvaloniaPrivateClinic.Models;
 
-public partial class Patient
+public class Patient
 {
     public int PatientId { get; set; }
 
@@ -23,15 +23,8 @@ public partial class Patient
     public decimal Phone { get; set; }
 
     public string Address { get; set; } = null!;
-    
-    [NotMapped]
-    public string ToString
-    {
-        get
-        {
-            return $"{LastName} {FirstName} {MiddleName}";
-        }
-    }
+
+    [NotMapped] public string ToString => $"{LastName} {FirstName} {MiddleName}";
 
     public virtual ICollection<Appointment> Appointments { get; set; } = new List<Appointment>();
 

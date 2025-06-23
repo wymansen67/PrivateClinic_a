@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AvaloniaPrivateClinic.Models;
 
-public partial class Appointment
+public class Appointment
 {
     public int AppointmentNumber { get; set; }
 
@@ -26,6 +27,13 @@ public partial class Appointment
     public int Specialist { get; set; }
 
     public TimeOnly? Time { get; set; }
+
+    [NotMapped]
+    public string ToString
+    {
+        get => $"{PurposeNavigation.PurposeName} - {Date}";
+        private set { }
+    }
 
     public virtual Office OfficeNavigation { get; set; } = null!;
 

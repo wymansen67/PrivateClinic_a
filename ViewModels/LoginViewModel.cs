@@ -2,11 +2,14 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Controls;
+using Avalonia.Controls.Notifications;
+using AvaloniaPrivateClinic.Encryption;
 using AvaloniaPrivateClinic.Models;
 using AvaloniaPrivateClinic.Utility;
 using AvaloniaPrivateClinic.Views;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Microsoft.EntityFrameworkCore;
 using MsBox.Avalonia;
 using MsBox.Avalonia.Enums;
 
@@ -22,10 +25,8 @@ public partial class LoginViewModel : ViewModelBase
 
     public LoginViewModel()
     {
-        Username = "wyman";
-        Password = "728281938293DA";
-        //Username = "admin";
-        //Password = "BfE44*AGv*796!";
+        Username = "wyman"; Password = "728281938293DA";
+        //Username = "admin"; Password = "BfE44*AGv*796!";
     }
 
     [RelayCommand]
@@ -80,8 +81,20 @@ public partial class LoginViewModel : ViewModelBase
 
             if (isPasswordValid)
             {
-
-                var specialist = _context.Specialists.FirstOrDefault(u => u.Id == user.UserId);
+                /*var manager = new WindowNotificationManager(window)
+                {
+                    Position = NotificationPosition.TopCenter,
+                    MaxItems = 3
+                };
+                manager.Show(new Notification("Info", "Подождите немного. Происходит синхронизация данных", NotificationType.Information, TimeSpan.FromSeconds(10)));*/
+                var specialist = _context.Specialists.Include(s => s.SpecializationNavigation)
+                    .FirstOrDefault(u => u.Id == user.UserId);
+                if (specialist != null)
+                {
+                    specialist.FirstName = Cryptography.Decrypt(specialist.FirstName);
+                    specialist.LastName = Cryptography.Decrypt(specialist.LastName);
+                    specialist.MiddleName = Cryptography.Decrypt(specialist.MiddleName);
+                }
 
                 MainWindow mainWindow = new(specialist, user);
                 mainWindow.Show();

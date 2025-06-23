@@ -1,30 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AvaloniaPrivateClinic.Models;
 
-public partial class Office
+public class Office
 {
     public int OfficeId { get; set; }
 
     public string? Number { get; set; }
 
     public int Type { get; set; }
-    
+
     [NotMapped]
     public string ToString
     {
         get
         {
-            if (TypeNavigation != null)
-            {
-                return $"{Number} - {TypeNavigation.TypeName}";
-            }
-            else
-            {
-                return $"{Number} - {Type}";
-            }
+            if (TypeNavigation != null) return $"{Number} - {TypeNavigation.TypeName}";
+
+            return $"{Number} - {Type}";
         }
     }
 

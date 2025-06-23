@@ -17,35 +17,21 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly ClinicDbContext _context = new();
 
-    #region SearchNFiltering
+    [ObservableProperty] private ObservableCollection<AppointmentRow> _appointmentsTable = new();
 
-    [ObservableProperty] private string? _searchString;
-    
-    partial void OnSearchStringChanged(string? value)
-    {
-        ApplyFilters();
-    }
-    
-    [ObservableProperty]
-    private DateOnly? _selectedDate;
+    [ObservableProperty] private string _loggedInAs = string.Empty;
 
-    partial void OnSelectedDateChanged(DateOnly? value)
-    {
-        ApplyFilters();
-    }
-
-    #endregion
-    
     public MainWindowViewModel(Specialist? specialist, User user, MainWindow window)
     {
         Specialist = specialist;
         User = user;
         Window = window;
+        if (specialist != null)
+            LoggedInAs =
+                $"Авторизован как:\n{Specialist.LastName} {Specialist.FirstName.Substring(0, 1)}. {Specialist.MiddleName.Substring(0, 1)}.\n{Specialist.SpecializationNavigation.Specialization1}";
 
         ResetCommand = new RelayCommand(Reset);
         AddCommand = new RelayCommand(Add);
-        ViewCommand = new RelayCommand(View);
-        RemoveCommand = new RelayCommand(Remove);
 
         Initialize();
     }
@@ -55,15 +41,11 @@ public partial class MainWindowViewModel : ViewModelBase
     private MainWindow Window { get; }
     public ObservableCollection<Appointment>? Appointments { get; set; }
     public Dictionary<DateOnly, List<Appointment>>? AppointmentDates { get; set; }
-    [ObservableProperty]
-    private ObservableCollection<AppointmentRow> _appointmentsTable = new();
 
     public ObservableCollection<DateOnly>? Dates { get; set; }
 
     public ICommand ResetCommand { get; }
     public ICommand AddCommand { get; }
-    public ICommand ViewCommand { get; }
-    public ICommand RemoveCommand { get; }
 
     private void Reset()
     {
@@ -75,16 +57,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private void Add()
     {
         CreateAppointment();
-    }
-
-    private void View()
-    {
-        ViewAppointment();
-    }
-
-    private void Remove()
-    {
-        RemoveAppointment();
     }
 
     private void Initialize()
@@ -102,7 +74,8 @@ public partial class MainWindowViewModel : ViewModelBase
             AppointmentsTable.Clear();
 
             foreach (var group in Appointments!
-                         .GroupBy(a => $"{a.PatientNavigation.LastName} {a.PatientNavigation.FirstName} {a.PatientNavigation.MiddleName}"))
+                         .GroupBy(a =>
+                             $"{a.PatientNavigation.LastName} {a.PatientNavigation.FirstName} {a.PatientNavigation.MiddleName}"))
             {
                 var row = new AppointmentRow
                 {
@@ -114,7 +87,6 @@ public partial class MainWindowViewModel : ViewModelBase
                 };
                 AppointmentsTable.Add(row);
             }
-
         }
         catch
         {
@@ -123,7 +95,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         return true;
     }
-    
+
     private void ApplyFilters()
     {
         if (Appointments is null || Dates is null)
@@ -133,23 +105,21 @@ public partial class MainWindowViewModel : ViewModelBase
 
         // Фильтр по ФИО
         if (!string.IsNullOrWhiteSpace(SearchString))
-        {
             filteredAppointments = filteredAppointments.Where(a =>
             {
-                var fullName = $"{a.PatientNavigation.LastName} {a.PatientNavigation.FirstName} {a.PatientNavigation.MiddleName}";
+                var fullName =
+                    $"{a.PatientNavigation.LastName} {a.PatientNavigation.FirstName} {a.PatientNavigation.MiddleName}";
                 return fullName.Contains(SearchString!, StringComparison.OrdinalIgnoreCase);
             });
-        }
 
         // Фильтр по дате
         if (SelectedDate.HasValue)
-        {
             filteredAppointments = filteredAppointments
                 .Where(a => a.Date == SelectedDate.Value);
-        }
 
         var grouped = filteredAppointments
-            .GroupBy(a => $"{a.PatientNavigation.LastName} {a.PatientNavigation.FirstName} {a.PatientNavigation.MiddleName}");
+            .GroupBy(a =>
+                $"{a.PatientNavigation.LastName} {a.PatientNavigation.FirstName} {a.PatientNavigation.MiddleName}");
 
         AppointmentsTable.Clear();
 
@@ -178,30 +148,33 @@ public partial class MainWindowViewModel : ViewModelBase
                     .Include(a => a.PatientNavigation)
                     .Include(a => a.SpecialistNavigation)
                     .Include(a => a.PurposeNavigation)
-                    .OrderBy(a => a.Date)
                     .Where(a => a.Specialist == Specialist!.Id)
                     .ToList()
-                    .Select( a =>
+                    .Select(a =>
                     {
-                        string? firstName = Cryptography.Decrypt(a.PatientNavigation.FirstName);
-                        string? middleName = Cryptography.Decrypt(a.PatientNavigation.MiddleName);
-                        string? lastName = Cryptography.Decrypt(a.PatientNavigation.LastName);
-                        
+                        var firstName = Cryptography.Decrypt(a.PatientNavigation.FirstName);
+                        var middleName = Cryptography.Decrypt(a.PatientNavigation.MiddleName);
+                        var lastName = Cryptography.Decrypt(a.PatientNavigation.LastName);
+
                         a.PatientNavigation.FirstName = firstName != null ? firstName : a.PatientNavigation.FirstName;
-                        a.PatientNavigation.MiddleName = middleName != null ? middleName : a.PatientNavigation.MiddleName;
+                        a.PatientNavigation.MiddleName =
+                            middleName != null ? middleName : a.PatientNavigation.MiddleName;
                         a.PatientNavigation.LastName = lastName != null ? lastName : a.PatientNavigation.LastName;
-                        
+
                         firstName = Cryptography.Decrypt(a.SpecialistNavigation.FirstName);
                         middleName = Cryptography.Decrypt(a.SpecialistNavigation.MiddleName);
                         lastName = Cryptography.Decrypt(a.SpecialistNavigation.LastName);
-                        
-                        a.SpecialistNavigation.FirstName = firstName != null ? firstName : a.SpecialistNavigation.FirstName;
-                        a.SpecialistNavigation.MiddleName = middleName != null ? middleName : a.SpecialistNavigation.MiddleName;
+
+                        a.SpecialistNavigation.FirstName =
+                            firstName != null ? firstName : a.SpecialistNavigation.FirstName;
+                        a.SpecialistNavigation.MiddleName =
+                            middleName != null ? middleName : a.SpecialistNavigation.MiddleName;
                         a.SpecialistNavigation.LastName = lastName != null ? lastName : a.SpecialistNavigation.LastName;
-                        
+
                         a.Commentaries = Cryptography.Decrypt(a.Commentaries)!;
                         return a;
-                    }).ToList()
+                    })
+                    .ToList()
             );
             return data;
         }
@@ -215,24 +188,27 @@ public partial class MainWindowViewModel : ViewModelBase
                     .Include(a => a.PurposeNavigation)
                     .OrderBy(a => a.Date)
                     .ToList()
-                    .Select( a =>
+                    .Select(a =>
                     {
-                        string? firstName = Cryptography.Decrypt(a.PatientNavigation.FirstName);
-                        string? middleName = Cryptography.Decrypt(a.PatientNavigation.MiddleName);
-                        string? lastName = Cryptography.Decrypt(a.PatientNavigation.LastName);
-                        
+                        var firstName = Cryptography.Decrypt(a.PatientNavigation.FirstName);
+                        var middleName = Cryptography.Decrypt(a.PatientNavigation.MiddleName);
+                        var lastName = Cryptography.Decrypt(a.PatientNavigation.LastName);
+
                         a.PatientNavigation.FirstName = firstName != null ? firstName : a.PatientNavigation.FirstName;
-                        a.PatientNavigation.MiddleName = middleName != null ? middleName : a.PatientNavigation.MiddleName;
+                        a.PatientNavigation.MiddleName =
+                            middleName != null ? middleName : a.PatientNavigation.MiddleName;
                         a.PatientNavigation.LastName = lastName != null ? lastName : a.PatientNavigation.LastName;
-                        
+
                         firstName = Cryptography.Decrypt(a.SpecialistNavigation.FirstName);
                         middleName = Cryptography.Decrypt(a.SpecialistNavigation.MiddleName);
                         lastName = Cryptography.Decrypt(a.SpecialistNavigation.LastName);
-                        
-                        a.SpecialistNavigation.FirstName = firstName != null ? firstName : a.SpecialistNavigation.FirstName;
-                        a.SpecialistNavigation.MiddleName = middleName != null ? middleName : a.SpecialistNavigation.MiddleName;
+
+                        a.SpecialistNavigation.FirstName =
+                            firstName != null ? firstName : a.SpecialistNavigation.FirstName;
+                        a.SpecialistNavigation.MiddleName =
+                            middleName != null ? middleName : a.SpecialistNavigation.MiddleName;
                         a.SpecialistNavigation.LastName = lastName != null ? lastName : a.SpecialistNavigation.LastName;
-                        
+
                         a.Commentaries = Cryptography.Decrypt(a.Commentaries)!;
                         return a;
                     }).ToList()
@@ -304,19 +280,27 @@ public partial class MainWindowViewModel : ViewModelBase
         Window.Close();
     }
 
-    private void ViewAppointment()
-    {
-        //TODO
-    }
-
-    private void RemoveAppointment()
-    {
-        //TODO
-    }
-    
     public class AppointmentRow
     {
         public string Patient { get; set; } = "";
         public Dictionary<DateOnly, List<Appointment>> AppointmentsByDate { get; set; } = new();
     }
+
+    #region SearchNFiltering
+
+    [ObservableProperty] private string? _searchString;
+
+    partial void OnSearchStringChanged(string? value)
+    {
+        ApplyFilters();
+    }
+
+    [ObservableProperty] private DateOnly? _selectedDate;
+
+    partial void OnSelectedDateChanged(DateOnly? value)
+    {
+        ApplyFilters();
+    }
+
+    #endregion
 }

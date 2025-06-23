@@ -1,0 +1,18 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:v="clr-namespace:AvaloniaPrivateClinic.Views"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaPrivateClinic.Views.ChooseAppointmentDialog"
+        x:DataType="v:ChooseAppointmentDialog"
+        Title="Выберите приём">
+    <StackPanel Margin="10">
+        <TextBlock Text="Выберите приём:" FontWeight="Bold" FontSize="18" Margin="0 0 0 10" />
+        <ListBox ItemsSource="{Binding Appointments}"
+                 SelectedItem="{Binding SelectedAppointment}"
+                 DisplayMemberBinding="{Binding ToString}" Height="200" />
+        <Button Content="ОК" Margin="0 10 0 0" HorizontalAlignment="Right" IsEnabled="{Binding SelectedAppointment}"
+                Command="{Binding ConfirmCommand}" />
+    </StackPanel>
+</Window>

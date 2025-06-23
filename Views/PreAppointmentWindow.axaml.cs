@@ -28,14 +28,9 @@ public partial class PreAppointmentWindow : Window
 
     private void PrepareInterface()
     {
-        if (!ViewModel.User.IsSuperuser)
+        if (ViewModel.User.IsSuperuser)
         {
-            CbReserve.IsVisible = true;
-        }
-        else if (ViewModel.User.IsSuperuser)
-        {
-            CbReserve.IsVisible = false;
-            CbReserve.IsChecked = true;
+            CbReserve.IsChecked = true; 
             BAddPatient.IsVisible = true;
             CbSpecialists.IsVisible = true;
             SpTime.IsVisible = true;
@@ -72,7 +67,8 @@ public partial class PreAppointmentWindow : Window
         try
         {
             await Task.WhenAll(tasks);
-
+            
+            ViewModel.LoadPlannedAppointmentsAsync().GetAwaiter().GetResult();
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 CbPatients.SelectedIndex = 0;

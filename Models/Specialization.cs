@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace AvaloniaPrivateClinic.Models;
 
-public partial class Specialization
+public class Specialization
 {
     public int Id { get; set; }
 

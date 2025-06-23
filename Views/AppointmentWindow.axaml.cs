@@ -13,6 +13,7 @@ public partial class AppointmentWindow : Window
         ViewModel = appointment == null
             ? new AppointmentViewModel(specialist, patient!, office!, user, this)
             : new AppointmentViewModel(specialist, appointment!, user, this);
+        ViewModel.WindowHeight = Height;
         DataContext = ViewModel;
     }
 

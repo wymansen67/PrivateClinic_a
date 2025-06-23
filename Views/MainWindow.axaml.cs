@@ -1,13 +1,8 @@
 using System;
-using System.Linq;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Controls.Templates;
-using Avalonia.Data;
-using Avalonia.Layout;
-using Avalonia.Media;
-using AvaloniaPrivateClinic.Converters;
+using Avalonia.Input;
 using AvaloniaPrivateClinic.Models;
 using AvaloniaPrivateClinic.ViewModels;
 
@@ -20,14 +15,34 @@ public partial class MainWindow : Window
         InitializeComponent();
         ViewModel = new MainWindowViewModel(specialist, user, this);
         DataContext = ViewModel;
-
-        Opened += OnWindowOpened;
     }
 
     private MainWindowViewModel ViewModel { get; }
 
-    private void OnWindowOpened(object? sender, EventArgs e)
+    private async void InputElement_OnTapped(object? sender, TappedEventArgs e)
     {
-        Task.Run(ViewModel.LoadDataAsync);
+        var button = sender as Button;
+        if (button?.DataContext is KeyValuePair<DateOnly, List<Appointment>> kvp)
+        {
+            var appointment = kvp;
+            var appointments = appointment.Value;
+            if (appointments.Count == 1)
+            {
+                AppointmentViewWindow aView = new(appointments[0].AppointmentNumber);
+                await aView.ShowDialog(this);
+            }
+            else
+            {
+                // В вызывающем окне:
+                var aChoose = new ChooseAppointmentDialog(appointments);
+                var result = await aChoose.ShowDialog<int?>(this); // если допускаешь отмену или null
+
+                if (result != null)
+                {
+                    var aView = new AppointmentViewWindow(result.Value);
+                    await aView.ShowDialog(this);
+                }
+            }
+        }
     }
 }

@@ -1,0 +1,92 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:AvaloniaPrivateClinic.ViewModels"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaPrivateClinic.Views.AppointmentViewWindow"
+        WindowState="Maximized"
+        x:DataType="vm:AppointmentViewViewModel"
+        Title="{Binding WindowTitle}">
+
+    <Grid RowDefinitions="Auto,*,Auto" ColumnDefinitions="2*,2*,2*">
+
+        <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left" Margin="10">
+            <Button Content="←" Command="{Binding GoBackCommand}" VerticalAlignment="Center" Margin="0,0,10,0" />
+            <TextBlock Text="Номер кабинета:" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" />
+            <TextBlock Text="{Binding OfficeLabel}" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="16" />
+        </StackPanel>
+
+        <StackPanel Grid.Row="0" Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="10">
+            <TextBlock Text="Дата:" VerticalAlignment="Center" FontSize="16" FontWeight="Bold" />
+            <TextBlock Text="{Binding DateLabel}" VerticalAlignment="Center" Margin="5,0,0,0" FontSize="16" />
+        </StackPanel>
+
+        <Border Grid.Row="1" Grid.Column="0" BorderBrush="LightGray" BorderThickness="1" Margin="10" Padding="5">
+            <StackPanel>
+                <TextBlock Text="Информация о пациенте и специалисте:" FontWeight="Bold" FontSize="22" Margin="0,0,0,5" />
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <TextBlock Text="{Binding PatientInfoText}" TextWrapping="Wrap" FontSize="22" />
+                </ScrollViewer>
+            </StackPanel>
+        </Border>
+
+        <StackPanel Grid.Row="1" Grid.Column="1" Margin="10">
+            <TextBlock Text="Причина приёма:" FontWeight="Bold" FontSize="14" />
+            <ComboBox ItemsSource="{Binding SelectedPurposes}"
+                      DisplayMemberBinding="{Binding PurposeName}"
+                      SelectedItem="{Binding SelectedPurpose}"
+                      IsEnabled="False"
+                      Width="NaN" HorizontalAlignment="Stretch" FontSize="14" Margin="0,5,0,10" />
+
+            <TextBlock Text="Комментарии:" FontWeight="Bold" FontSize="14" />
+            <TextBox Text="{Binding Commentaries}"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     IsReadOnly="True"
+                     MinHeight="100"
+                     MaxHeight="200"
+                     Margin="0,5,0,10" FontSize="14" />
+
+            <TextBlock Text="Диагноз:" FontWeight="Bold" FontSize="14" />
+            <ListBox ItemsSource="{Binding SelectedDiagnoses}"
+                     MinHeight="100" MaxHeight="150" Margin="0,0,0,10" FontSize="14">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding ToString}" TextWrapping="Wrap" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+
+        <StackPanel Grid.Row="1" Grid.Column="2" Margin="10">
+            <TextBlock Text="Услуги:" FontWeight="Bold" FontSize="14" />
+            <ListBox ItemsSource="{Binding SelectedServices}"
+                     MinHeight="100" MaxHeight="150" Margin="0,0,0,10" FontSize="14">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding Name}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <TextBlock Text="Оборудование:" FontWeight="Bold" FontSize="14" />
+            <ListBox ItemsSource="{Binding SelectedEquipments}"
+                     MinHeight="100" MaxHeight="150" Margin="0,0,0,10" FontSize="14">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding EquipmentName}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </StackPanel>
+
+        <StackPanel Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="3" Orientation="Horizontal"
+                    HorizontalAlignment="Right" Margin="10">
+            <TextBlock Text="Общая стоимость:" VerticalAlignment="Center" FontSize="18" FontWeight="Bold" />
+            <TextBlock Text="{Binding TotalPrice, StringFormat='{}{0:C}'}" MinWidth="100" VerticalAlignment="Center"
+                       Margin="5,0,0,0" FontSize="18" />
+        </StackPanel>
+
+    </Grid>
+</Window>

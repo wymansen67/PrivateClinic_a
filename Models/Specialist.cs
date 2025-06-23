@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AvaloniaPrivateClinic.Models;
 
-public partial class Specialist
+public class Specialist
 {
     public int Id { get; set; }
 
@@ -19,20 +18,17 @@ public partial class Specialist
     public string SpecializationType { get; set; } = null!;
 
     public decimal Phone { get; set; }
-    
+
     [NotMapped]
     public string ToString
     {
         get
         {
             if (SpecializationNavigation != null)
-            {
-                return $"{LastName} {FirstName.Substring(0, 1)}. {MiddleName.Substring(0, 1)}. - {SpecializationNavigation.Specialization1}";
-            }
-            else
-            {
-                return $"{LastName} {FirstName.Substring(0, 1)}. {MiddleName.Substring(0, 1)}.";
-            }
+                return
+                    $"{LastName} {FirstName.Substring(0, 1)}. {MiddleName.Substring(0, 1)}. - {SpecializationNavigation.Specialization1}";
+
+            return $"{LastName} {FirstName.Substring(0, 1)}. {MiddleName.Substring(0, 1)}.";
         }
     }
 

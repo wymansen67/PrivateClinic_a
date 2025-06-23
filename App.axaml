@@ -8,6 +8,7 @@
 
     <Application.Resources>
         <cnv:ListToStringConverter x:Key="ListToStringConverter" />
+        <cnv:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
     </Application.Resources>
 
     <Application.DataTemplates>

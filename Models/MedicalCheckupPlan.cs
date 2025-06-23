@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace AvaloniaPrivateClinic.Models;
 
-public partial class MedicalCheckupPlan
+public class MedicalCheckupPlan
 {
     public int MedicalCheckupId { get; set; }
 
